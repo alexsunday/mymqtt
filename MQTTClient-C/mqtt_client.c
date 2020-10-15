@@ -1,5 +1,5 @@
 /****************************************Copyright (c)****************************************************
-**                             ³É ¶¼ ÊÀ ¼Í »ª Äþ ¿Æ ¼¼ ÓÐ ÏÞ ¹« Ë¾
+**                             æˆ éƒ½ ä¸– çºª åŽ å® ç§‘ æŠ€ æœ‰ é™ å…¬ å¸
 **                                http://www.huaning-iot.com
 **                                http://hichard.taobao.com
 **
@@ -8,13 +8,13 @@
 ** File Name:           mqtt_client.c
 ** Last modified Date:  2019-10-25
 ** Last Version:        v1.0
-** Description:         mqtt¿Í»§¶Ë×é¼þÊµÏÖ
+** Description:         mqttå®¢æˆ·ç«¯ç»„ä»¶å®žçŽ°
 **
 **--------------------------------------------------------------------------------------------------------
-** Created By:          RenhaiboÈÎº£²¨
+** Created By:          Renhaiboä»»æµ·æ³¢
 ** Created date:        2019-10-25
 ** Version:             v1.0
-** Descriptions:        The original version ³õÊ¼°æ±¾
+** Descriptions:        The original version åˆå§‹ç‰ˆæœ¬
 **
 **--------------------------------------------------------------------------------------------------------
 ** Modified by:
@@ -38,7 +38,7 @@
 #include "mqtt_client.h"
 
 /*********************************************************************************************************
-**  µ÷ÊÔÅäÖÃ
+**  è°ƒè¯•é…ç½®
 *********************************************************************************************************/
 #define DBG_ENABLE
 #define DBG_SECTION_NAME    "mqtt"
@@ -57,17 +57,17 @@
 #endif
 
 /*********************************************************************************************************
-**  mqtt¿Í»§¶ËÍ¨ÐÅËø
+**  mqttå®¢æˆ·ç«¯é€šä¿¡é”
 *********************************************************************************************************/
 #define mqtt_client_lock(c)          rt_mutex_take(c->mqtt_lock, RT_WAITING_FOREVER)
 #define mqtt_client_unlock(c)        rt_mutex_release(c->mqtt_lock)
 
 /*********************************************************************************************************
 ** Function name:       mqtt_resolve_uri
-** Descriptions:        mqtt urlµØÖ·½âÎö
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý£¬ÀïÃæÒÑ¾­¸³ÖµÁËurlµØÖ·     
-** output parameters:   res£º ½âÎöIPµØÖ·ºÍ¶Ë¿ÚºÅ´æ·Å
-** Returned value:      0£º½âÎö³É¹¦£» ÆäËü£º½âÎöÊ§°Ü
+** Descriptions:        mqtt urlåœ°å€è§£æž
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹ï¼Œé‡Œé¢å·²ç»èµ‹å€¼äº†urlåœ°å€     
+** output parameters:   resï¼š è§£æžIPåœ°å€å’Œç«¯å£å·å­˜æ”¾
+** Returned value:      0ï¼šè§£æžæˆåŠŸï¼› å…¶å®ƒï¼šè§£æžå¤±è´¥
 **      URL example:
 **      tcp://192.168.10.151:1883
 **      tls://192.168.10.151:61614
@@ -213,10 +213,10 @@ _exit:
 #ifdef MQTT_USING_TLS
 /*********************************************************************************************************
 ** Function name:       mqtt_open_tls
-** Descriptions:        ´ò¿ªtls¼ÓÃÜ´«Êä£¬·ÖÅä¼ÓÃÜ´«ÊäµÄ×ÊÔ´
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        æ‰“å¼€tlsåŠ å¯†ä¼ è¾“ï¼Œåˆ†é…åŠ å¯†ä¼ è¾“çš„èµ„æº
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NONE
-** Returned value:      RT_EOK£º´ò¿ª³É¹¦£» ÆäËü£º´íÎóÂë
+** Returned value:      RT_EOKï¼šæ‰“å¼€æˆåŠŸï¼› å…¶å®ƒï¼šé”™è¯¯ç 
 *********************************************************************************************************/
 static int mqtt_open_tls(mqtt_client *c)
 {
@@ -256,10 +256,10 @@ static int mqtt_open_tls(mqtt_client *c)
 
 /*********************************************************************************************************
 ** Function name:       net_connect
-** Descriptions:        ÍøÂçÁ¬½Ó·þÎñÆ÷
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        ç½‘ç»œè¿žæŽ¥æœåŠ¡å™¨
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NONE
-** Returned value:      0£ºÁ¬½Ó³É¹¦£» ÆäËü£ºÁ¬½ÓÊ§°Ü
+** Returned value:      0ï¼šè¿žæŽ¥æˆåŠŸï¼› å…¶å®ƒï¼šè¿žæŽ¥å¤±è´¥
 *********************************************************************************************************/
 static int net_connect(mqtt_client *c)
 {
@@ -293,7 +293,12 @@ static int net_connect(mqtt_client *c)
     LOG_E("resolve uri err");
     goto _exit;
   }
-  
+  if (addr_res)
+  {
+    freeaddrinfo(addr_res);
+    addr_res = RT_NULL;
+  }
+
 #ifdef MQTT_USING_TLS
   if (c->tls_session)
   {
@@ -359,10 +364,10 @@ _exit:
 
 /*********************************************************************************************************
 ** Function name:       net_disconnect
-** Descriptions:        ÍøÂç¹Ø±ÕÁ¬½Ó
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        ç½‘ç»œå…³é—­è¿žæŽ¥
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NONE
-** Returned value:      0£º¹Ø±Õ³É¹¦
+** Returned value:      0ï¼šå…³é—­æˆåŠŸ
 *********************************************************************************************************/
 static int net_disconnect(mqtt_client *c)
 {
@@ -386,10 +391,10 @@ static int net_disconnect(mqtt_client *c)
 
 /*********************************************************************************************************
 ** Function name:       net_disconnect_exit
-** Descriptions:        mqtt¹Ø±Õ£¬ÊÍ·Å×ÊÔ´
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        mqttå…³é—­ï¼Œé‡Šæ”¾èµ„æº
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NONE
-** Returned value:      0£º¹Ø±Õ³É¹¦
+** Returned value:      0ï¼šå…³é—­æˆåŠŸ
 *********************************************************************************************************/
 static int net_disconnect_exit(mqtt_client *c)
 {
@@ -430,13 +435,13 @@ static int net_disconnect_exit(mqtt_client *c)
 
 /*********************************************************************************************************
 ** Function name:       send_packet
-** Descriptions:        ÍøÂç·¢ËÍÒ»¸öÊý¾Ý°ü
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      buf:  ·¢ËÍÊý¾Ý»º³åÇø
-**                      length£º ·¢ËÍÊý¾Ý³¤¶È
+** Descriptions:        ç½‘ç»œå‘é€ä¸€ä¸ªæ•°æ®åŒ…
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      buf:  å‘é€æ•°æ®ç¼“å†²åŒº
+**                      lengthï¼š å‘é€æ•°æ®é•¿åº¦
 ** output parameters:   NONE
-** Returned value:      PAHO_FAILURE: ·¢ËÍÊ§°Ü£¬·¢ÉúÁËÒ»Ð©Òì³££¬ÐèÒª¹Ø±ÕÁ¬½Ó
-**                      PAHO_SUCCESS£º ·¢ËÍ³É¹¦
+** Returned value:      PAHO_FAILURE: å‘é€å¤±è´¥ï¼Œå‘ç”Ÿäº†ä¸€äº›å¼‚å¸¸ï¼Œéœ€è¦å…³é—­è¿žæŽ¥
+**                      PAHO_SUCCESSï¼š å‘é€æˆåŠŸ
 *********************************************************************************************************/
 static int send_packet(mqtt_client *c, void *buf, int length)
 {
@@ -486,11 +491,11 @@ __send_exit:
 
 /*********************************************************************************************************
 ** Function name:       recv_packet
-** Descriptions:        ÍøÂç½ÓÊÕÊý¾Ý°ü
-** input parameters:    c:    mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        ç½‘ç»œæŽ¥æ”¶æ•°æ®åŒ…
+** input parameters:    c:    mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NONE
-** Returned value:      -1:     Á¬½ÓÒÑ¶Ï¿ª
-**                      bytes£º ¶Áµ½µÄÊý¾Ý³¤¶È
+** Returned value:      -1:     è¿žæŽ¥å·²æ–­å¼€
+**                      bytesï¼š è¯»åˆ°çš„æ•°æ®é•¿åº¦
 *********************************************************************************************************/
 static int recv_packet(mqtt_client *c, unsigned char *buf,  int len, int timeout)
 {
@@ -543,11 +548,11 @@ static int recv_packet(mqtt_client *c, unsigned char *buf,  int len, int timeout
 
 /*********************************************************************************************************
 ** Function name:       decode_packet
-** Descriptions:        ¶ÁÈ¡²¢½âÎömqttÖ¡ÖÐµÄ³¤¶È×Ö¶Î
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      timeout£º ¶ÁÈ¡³¬Ê±Ê±¼ä£¬ÒÔºÁÃëÎªµ¥Î»
-** output parameters:   value£º ¶ÁÈ¡³¤¶È´æ·ÅµØÖ·
-** Returned value:      ¶ÁÈ¡´ÎÊý
+** Descriptions:        è¯»å–å¹¶è§£æžmqttå¸§ä¸­çš„é•¿åº¦å­—æ®µ
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      timeoutï¼š è¯»å–è¶…æ—¶æ—¶é—´ï¼Œä»¥æ¯«ç§’ä¸ºå•ä½
+** output parameters:   valueï¼š è¯»å–é•¿åº¦å­˜æ”¾åœ°å€
+** Returned value:      è¯»å–æ¬¡æ•°
 *********************************************************************************************************/
 static int decode_packet(mqtt_client *c, int *value, int timeout)
 {
@@ -579,10 +584,10 @@ exit:
 
 /*********************************************************************************************************
 ** Function name:       mqttpacket_readpacket
-** Descriptions:        ¶ÁÈ¡Ò»¸ömqttÊý¾Ý°ü
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        è¯»å–ä¸€ä¸ªmqttæ•°æ®åŒ…
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      Êý¾Ý°üÀàÐÍ
+** Returned value:      æ•°æ®åŒ…ç±»åž‹
 *********************************************************************************************************/
 static int mqttpacket_readpacket(mqtt_client *c)
 {
@@ -617,10 +622,10 @@ __read_exit:
 
 /*********************************************************************************************************
 ** Function name:       get_next_packetId
-** Descriptions:        »ñÈ¡ÏÂÒ»¸öÓÐÐ§µÄÊý¾Ý°üID
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        èŽ·å–ä¸‹ä¸€ä¸ªæœ‰æ•ˆçš„æ•°æ®åŒ…ID
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      »ñÈ¡µ½µÄÊý¾Ý°üID
+** Returned value:      èŽ·å–åˆ°çš„æ•°æ®åŒ…ID
 *********************************************************************************************************/
 static int get_next_packetId(mqtt_client *c)
 {
@@ -629,10 +634,10 @@ static int get_next_packetId(mqtt_client *c)
 
 /*********************************************************************************************************
 ** Function name:       mqtt_connect
-** Descriptions:        Á¬½ÓMQTT·þÎñÆ÷
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        è¿žæŽ¥MQTTæœåŠ¡å™¨
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      Á¬½Ó½á¹û¡£-1£ºÒÑ¾­Á¬½Ó»òÁ¬½ÓÊ§°Ü£»0£ºÁ¬½Ó³É¹¦
+** Returned value:      è¿žæŽ¥ç»“æžœã€‚-1ï¼šå·²ç»è¿žæŽ¥æˆ–è¿žæŽ¥å¤±è´¥ï¼›0ï¼šè¿žæŽ¥æˆåŠŸ
 *********************************************************************************************************/
 static int mqtt_connect(mqtt_client *c)
 {
@@ -703,10 +708,10 @@ __connect_exit:
 
 /*********************************************************************************************************
 ** Function name:       mqtt_disconnect
-** Descriptions:        ¶Ï¿ªÁ¬½ÓMQTT·þÎñÆ÷
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        æ–­å¼€è¿žæŽ¥MQTTæœåŠ¡å™¨
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      »ñÈ¡µ½µÄÊý¾Ý°üID
+** Returned value:      èŽ·å–åˆ°çš„æ•°æ®åŒ…ID
 *********************************************************************************************************/
 static int mqtt_disconnect(mqtt_client *c)
 {
@@ -724,12 +729,12 @@ static int mqtt_disconnect(mqtt_client *c)
 
 /*********************************************************************************************************
 ** Function name:       mqtt_subscribe
-** Descriptions:        MQTTÖ÷Ìâ¶©ÔÄ
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      topicFilter£º ¶©ÔÄµÄÖ÷Ìâ
-**                      qos£º     ¶©ÔÄÖ÷ÌâµÄÁ´Â·ÖÊÁ¿
+** Descriptions:        MQTTä¸»é¢˜è®¢é˜…
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      topicFilterï¼š è®¢é˜…çš„ä¸»é¢˜
+**                      qosï¼š     è®¢é˜…ä¸»é¢˜çš„é“¾è·¯è´¨é‡
 ** output parameters:   NULL
-** Returned value:      ¶©ÔÄ½á¹û¡£0:¶©ÔÄ³É¹¦
+** Returned value:      è®¢é˜…ç»“æžœã€‚0:è®¢é˜…æˆåŠŸ
 *********************************************************************************************************/
 static int mqtt_subscribe(mqtt_client *c, const char *topicFilter, enum QoS qos)
 {
@@ -798,10 +803,10 @@ _exit:
 
 /*********************************************************************************************************
 ** Function name:       new_message_data
-** Descriptions:        ¸³ÖµÒ»¸öÏûÏ¢
-** input parameters:    md:          ´ý¸³ÖµµÄÏûÏ¢
-**                      aTopicName£º ÏûÏ¢Ö÷Ìâ
-**                      aMessage£º   ÏûÏ¢ÄÚÈÝ
+** Descriptions:        èµ‹å€¼ä¸€ä¸ªæ¶ˆæ¯
+** input parameters:    md:          å¾…èµ‹å€¼çš„æ¶ˆæ¯
+**                      aTopicNameï¼š æ¶ˆæ¯ä¸»é¢˜
+**                      aMessageï¼š   æ¶ˆæ¯å†…å®¹
 ** output parameters:   NULL
 ** Returned value:      NULL
 *********************************************************************************************************/
@@ -813,12 +818,12 @@ static void new_message_data(message_data *md, MQTTString *aTopicName, mqtt_mess
 
 /*********************************************************************************************************
 ** Function name:       is_topic_matched
-** Descriptions:        Ð£ÑéÖ÷ÌâÊÇ·ñÆ¥Åä
-** input parameters:    topicFilter:  Æ¥ÅäÄ¿µÄÖ÷Ìâ
-**                      topic_name£º   Æ¥ÅäÔ´Ö÷Ìâ
+** Descriptions:        æ ¡éªŒä¸»é¢˜æ˜¯å¦åŒ¹é…
+** input parameters:    topicFilter:  åŒ¹é…ç›®çš„ä¸»é¢˜
+**                      topic_nameï¼š   åŒ¹é…æºä¸»é¢˜
 ** output parameters:   NULL
-** Returned value:      Æ¥Åä½á¹û¡£0£ºÆ¥ÅäÊ§°Ü£»1£ºÆ¥Åä³É¹¦
-**   Í¨Åä·ûËµÃ÷£º
+** Returned value:      åŒ¹é…ç»“æžœã€‚0ï¼šåŒ¹é…å¤±è´¥ï¼›1ï¼šåŒ¹é…æˆåŠŸ
+**   é€šé…ç¬¦è¯´æ˜Žï¼š
 **   #can only be at end
 **   + and # can only be next to separator
 *********************************************************************************************************/
@@ -852,11 +857,11 @@ static char is_topic_matched(char *topicFilter, MQTTString *topic_name)
 
 /*********************************************************************************************************
 ** Function name:       deliver_message
-** Descriptions:        ´¦ÀíMQTTÏûÏ¢
-** input parameters:    topicFilter:  Æ¥ÅäÄ¿µÄÖ÷Ìâ
-**                      topic_name£º   Æ¥ÅäÔ´Ö÷Ìâ
+** Descriptions:        å¤„ç†MQTTæ¶ˆæ¯
+** input parameters:    topicFilter:  åŒ¹é…ç›®çš„ä¸»é¢˜
+**                      topic_nameï¼š   åŒ¹é…æºä¸»é¢˜
 ** output parameters:   NULL
-** Returned value:      ´¦Àí½á¹û
+** Returned value:      å¤„ç†ç»“æžœ
 *********************************************************************************************************/
 static int deliver_message(mqtt_client *c, MQTTString *topic_name, mqtt_message *message)
 {
@@ -892,10 +897,10 @@ static int deliver_message(mqtt_client *c, MQTTString *topic_name, mqtt_message 
 
 /*********************************************************************************************************
 ** Function name:       mqtt_cycle
-** Descriptions:        ´¦ÀíMQTTÏûÏ¢
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        å¤„ç†MQTTæ¶ˆæ¯
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      ´¦Àí½á¹û
+** Returned value:      å¤„ç†ç»“æžœ
 *********************************************************************************************************/
 static int mqtt_cycle(mqtt_client *c)
 {
@@ -1026,8 +1031,8 @@ __cycle_exit:
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_thread
-** Descriptions:        mqtt´¦ÀíºËÐÄÏß³Ì
-** input parameters:    param: Ïß³Ì´«Èë²ÎÊý
+** Descriptions:        mqttå¤„ç†æ ¸å¿ƒçº¿ç¨‹
+** input parameters:    param: çº¿ç¨‹ä¼ å…¥å‚æ•°
 ** output parameters:   NULL
 ** Returned value:      NULL
 *********************************************************************************************************/
@@ -1037,7 +1042,7 @@ static void paho_mqtt_thread(void *param)
   int i, rc, len;
   int rc_t = 0;
   
-  // ÅäÖÃ²ÎÊý¼ì²é
+  // é…ç½®å‚æ•°æ£€æŸ¥
   if(c->keepalive_interval == 0) {
     c->keepalive_interval = 60;
   }
@@ -1149,7 +1154,7 @@ __mqtt_start:
       goto __mqtt_disconnect;
     }
     
-    // Èç¹ûÓÐ½ÓÊÕµ½Êý¾Ý£¬Ôò´¦Àí½ÓÊÕÊý¾Ý
+    // å¦‚æžœæœ‰æŽ¥æ”¶åˆ°æ•°æ®ï¼Œåˆ™å¤„ç†æŽ¥æ”¶æ•°æ®
     if (FD_ISSET(c->sock, &readset)) {
       rc_t = mqtt_cycle(c);
       if (rc_t < 0)    goto __mqtt_disconnect;
@@ -1183,12 +1188,12 @@ __mqtt_disconnect_exit:
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_start
-** Descriptions:        ³õÊ¼»¯mqtt
-** input parameters:    c:           mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      stack_size£º mqttºËÐÄÏß³ÌÕ»´óÐ¡
-**                      priority£º   mqttºËÐÄÏß³ÌÓÅÏÈ¼¶
+** Descriptions:        åˆå§‹åŒ–mqtt
+** input parameters:    c:           mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      stack_sizeï¼š mqttæ ¸å¿ƒçº¿ç¨‹æ ˆå¤§å°
+**                      priorityï¼š   mqttæ ¸å¿ƒçº¿ç¨‹ä¼˜å…ˆçº§
 ** output parameters:   NULL
-** Returned value:      ³õÊ¼»¯½á¹û¡£PAHO_SUCCESS£º³É¹¦£» ÆäËü£ºÊ§°Ü
+** Returned value:      åˆå§‹åŒ–ç»“æžœã€‚PAHO_SUCCESSï¼šæˆåŠŸï¼› å…¶å®ƒï¼šå¤±è´¥
 *********************************************************************************************************/
 int paho_mqtt_start(mqtt_client *client, rt_uint32_t stack_size, rt_uint8_t  priority)
 {
@@ -1228,10 +1233,10 @@ int paho_mqtt_start(mqtt_client *client, rt_uint32_t stack_size, rt_uint8_t  pri
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_stop
-** Descriptions:        ÖÕÖ¹Ö¸¶¨µÄmqttÓ¦ÓÃ
-** input parameters:    c:           mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        ç»ˆæ­¢æŒ‡å®šçš„mqttåº”ç”¨
+** input parameters:    c:           mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      PAHO_SUCCESS£º³É¹¦£» ÆäËü£ºÊ§°Ü
+** Returned value:      PAHO_SUCCESSï¼šæˆåŠŸï¼› å…¶å®ƒï¼šå¤±è´¥
 *********************************************************************************************************/
 int paho_mqtt_stop(mqtt_client *client)
 {
@@ -1241,13 +1246,13 @@ int paho_mqtt_stop(mqtt_client *client)
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_subscribe
-** Descriptions:        mqttÏûÏ¢¶©ÔÄ
-** input parameters:    client:      mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      qos£º        Á´Â·ÖÊÁ¿
-**                      topic:       ¶©ÔÄÖ÷Ìâ
-**                      callback:    Æ¥Åä¸ÃÖ÷ÌâµÄ»Øµ÷º¯Êý
+** Descriptions:        mqttæ¶ˆæ¯è®¢é˜…
+** input parameters:    client:      mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      qosï¼š        é“¾è·¯è´¨é‡
+**                      topic:       è®¢é˜…ä¸»é¢˜
+**                      callback:    åŒ¹é…è¯¥ä¸»é¢˜çš„å›žè°ƒå‡½æ•°
 ** output parameters:   NULL
-** Returned value:      PAHO_SUCCESS£º³É¹¦£» ÆäËü£ºÊ§°Ü
+** Returned value:      PAHO_SUCCESSï¼šæˆåŠŸï¼› å…¶å®ƒï¼šå¤±è´¥
 *********************************************************************************************************/
 int paho_mqtt_subscribe(mqtt_client *client, enum QoS qos, const char *topic, subscribe_cb callback)
 {
@@ -1329,11 +1334,11 @@ __subscribe_exit:
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_unsubscribe
-** Descriptions:        È¡ÏûmqttÏûÏ¢¶©ÔÄ
-** input parameters:    client:      mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      topic:       ¶©ÔÄÖ÷Ìâ
+** Descriptions:        å–æ¶ˆmqttæ¶ˆæ¯è®¢é˜…
+** input parameters:    client:      mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      topic:       è®¢é˜…ä¸»é¢˜
 ** output parameters:   NULL
-** Returned value:      PAHO_SUCCESS£º³É¹¦£» ÆäËü£ºÊ§°Ü
+** Returned value:      PAHO_SUCCESSï¼šæˆåŠŸï¼› å…¶å®ƒï¼šå¤±è´¥
 *********************************************************************************************************/
 int paho_mqtt_unsubscribe(mqtt_client *client, const char *topic)
 {
@@ -1409,14 +1414,14 @@ __unsubscribe_exit:
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_publish
-** Descriptions:        ·¢²¼mqttÏûÏ¢
-** input parameters:    client:      mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      qos£º        ·¢²¼ÏûÏ¢µÄÁ´Â·ÖÊÁ¿
-**                      topic:       ·¢²¼Ö÷Ìâ
-**                      payload£º    ·¢ËÍµÄÊý¾Ý
-**                      length£º     Êý¾Ý³¤¶È
+** Descriptions:        å‘å¸ƒmqttæ¶ˆæ¯
+** input parameters:    client:      mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      qosï¼š        å‘å¸ƒæ¶ˆæ¯çš„é“¾è·¯è´¨é‡
+**                      topic:       å‘å¸ƒä¸»é¢˜
+**                      payloadï¼š    å‘é€çš„æ•°æ®
+**                      lengthï¼š     æ•°æ®é•¿åº¦
 ** output parameters:   NULL
-** Returned value:      PAHO_SUCCESS£º³É¹¦£» ÆäËü£ºÊ§°Ü
+** Returned value:      PAHO_SUCCESSï¼šæˆåŠŸï¼› å…¶å®ƒï¼šå¤±è´¥
 *********************************************************************************************************/
 int paho_mqtt_publish(mqtt_client *client, enum QoS qos, const char *topic, void *payload, size_t length)
 {
@@ -1475,10 +1480,10 @@ __publish_exit:
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_is_connected
-** Descriptions:        ÅÐ¶ÏÁ¬½Ómqtt·þÎñÆ÷ÊÇ·ñ³É¹¦
-** input parameters:    client:      mqtt¿Í»§¶Ë½á¹¹ÊµÀý
+** Descriptions:        åˆ¤æ–­è¿žæŽ¥mqttæœåŠ¡å™¨æ˜¯å¦æˆåŠŸ
+** input parameters:    client:      mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
 ** output parameters:   NULL
-** Returned value:      1: Á¬½Ó³É¹¦£»0£ºÎ´Á¬½Ó
+** Returned value:      1: è¿žæŽ¥æˆåŠŸï¼›0ï¼šæœªè¿žæŽ¥
 *********************************************************************************************************/
 int paho_mqtt_is_connected(mqtt_client *client)
 {
@@ -1487,12 +1492,12 @@ int paho_mqtt_is_connected(mqtt_client *client)
 
 /*********************************************************************************************************
 ** Function name:       paho_mqtt_control
-** Descriptions:        mqtt¿Í»§¶ËÅäÖÃ
-** input parameters:    c:        mqtt¿Í»§¶Ë½á¹¹ÊµÀý
-**                      cmd:      ÅäÖÃÃüÁî
-**                      arg£º     ÅäÖÃµÄÖµÖ¸Õë
+** Descriptions:        mqttå®¢æˆ·ç«¯é…ç½®
+** input parameters:    c:        mqttå®¢æˆ·ç«¯ç»“æž„å®žä¾‹
+**                      cmd:      é…ç½®å‘½ä»¤
+**                      argï¼š     é…ç½®çš„å€¼æŒ‡é’ˆ
 ** output parameters:   NULL
-** Returned value:      ÅäÖÃ½á¹û¡£PAHO_SUCCESS£º³É¹¦£»ÆäËü£ºÊ§°Ü
+** Returned value:      é…ç½®ç»“æžœã€‚PAHO_SUCCESSï¼šæˆåŠŸï¼›å…¶å®ƒï¼šå¤±è´¥
 *********************************************************************************************************/
 int paho_mqtt_control(mqtt_client *client, int cmd, void *arg)
 {
